@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package chat;
+
+// The garage service definition.
+service Chat {
+  rpc Stream(stream Message) returns (stream Message) {}
+}
+
+message Message {
+  string body = 1;
+}
