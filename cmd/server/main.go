@@ -16,8 +16,18 @@ const (
 
 type server struct{}
 
-func (s *server) Stream(pb.Chat_StreamServer) error {
+func (s *server) Stream(cs pb.Chat_StreamServer) error {
 	fmt.Println("streaming")
+
+	m := &pb.Message{Body: "server up!"}
+	cs.Send(m)
+
+	r, err := cs.Recv()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(r)
+
 	return nil
 }
 

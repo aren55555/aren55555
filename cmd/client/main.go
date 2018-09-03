@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"log"
 
@@ -9,18 +10,20 @@ import (
 	"google.golang.org/grpc"
 )
 
-const (
-	address = "localhost:50051"
+var (
+	flagServer = flag.String("server", "localhost:50051", "the address of the server")
 )
 
 func main() {
+	flag.Parse()
+
 	fmt.Println("aren55555 client")
 
 	m := &pb.Message{Body: "Hello World"}
 	fmt.Println(m)
 
 	// Set up a connection to the server.
-	conn, err := grpc.Dial(address, grpc.WithInsecure())
+	conn, err := grpc.Dial(*flagServer, grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
