@@ -4,7 +4,12 @@ services:
     build: ./cmd/client
     links:
     - server
+    entrypoint:
+      - client
+      - -server=server:50051
   server:
     build: ./cmd/server
     ports:
       - "50051:50051"
+    entrypoint:
+      - server

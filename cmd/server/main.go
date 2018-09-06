@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"net"
 
@@ -14,21 +15,35 @@ const (
 	port = ":50051"
 )
 
-type server struct{}
+type server struct {
+	servers []pb.Chat_StreamServer
+}
+
+var connections map[string]*pb.Chat_StreamServer
 
 func (s *server) Stream(cs pb.Chat_StreamServer) error {
-	fmt.Println("streaming")
+	s.servers = append(s.servers, cs)
 
-	m := &pb.Message{Body: "server up!"}
-	cs.Send(m)
+	for {
+		in, err := cs.Recv()
+		fmt.Println("\n\n\nReceived value")
+		if err == io.EOF {
+			fmt.Println("EOF")
+			return nil
+		}
+		if err != nil {
+			fmt.Println("Error:", err)
+			return err
+		}
+		fmt.Println(in)
 
-	r, err := cs.Recv()
-	if err != nil {
-		panic(err)
+		for _, server := range s.servers {
+			if server == cs {
+				continue
+			}
+			server.Send(in)
+		}
 	}
-	fmt.Println(r)
-
-	return nil
 }
 
 func main() {
